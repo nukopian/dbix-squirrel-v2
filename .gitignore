@@ -33,3 +33,7 @@ inc/
 /MANIFEST.bak
 /pm_to_blib
 /*.zip
+
+# VSCode
+dbix-squirrel-v2.code-workspace
+.vscode/
