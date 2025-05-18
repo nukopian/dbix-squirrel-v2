@@ -74,4 +74,3 @@
 -nsbl   # Opening brace on same line as named sub
 -nasbl  # Opening brace on same line as anonymous sub
 -nolq   # Do not outdent long quotes
-
