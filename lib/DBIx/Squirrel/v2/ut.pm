@@ -31,6 +31,14 @@ our @EXPORT_OK = qw(
     is_plain_arrayref
     is_plain_coderef
     is_plain_hashref
+    RootClass
 );
+
+
+sub RootClass ( $class, %attr ) {
+    ( $class = ref($class) // $class // __PACKAGE__ ) =~ s/::[^:]+$//;
+    return $class unless wantarray;
+    return 'RootClass' => $class, %attr;
+}
 
 1;

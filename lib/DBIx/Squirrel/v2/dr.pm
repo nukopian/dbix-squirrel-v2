@@ -9,16 +9,10 @@ use DBIx::Squirrel::v2::ut qw(
     croak
     is_blessed_ref
     is_plain_hashref
+    RootClass
 );
 
 use namespace::clean;
-
-
-sub RootClass ( $class, @args ) {
-    ( $class = ref($class) // $class // __PACKAGE__ ) =~ s/::[^:]+$//;
-    return $class unless wantarray;
-    return 'RootClass' => $class, @args;
-}
 
 
 sub connect ( $class, @args ) {
