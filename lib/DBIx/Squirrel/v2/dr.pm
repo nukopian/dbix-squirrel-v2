@@ -32,8 +32,8 @@ sub connect ( $class, @args ) {
         }
     };
     if ( @args && is_blessed_ref( $args[0] ) ) {
-        $args[0]->isa('DBI::db')
-            or croak q(Not a 'DBD::db' object);
+        croak q(Not a 'DBD::db' object)
+            unless $args[0]->isa('DBI::db');
         return shift(@args)->clone( \%attr );
     }
     return DBI::connect( $class, @args, \%attr );
