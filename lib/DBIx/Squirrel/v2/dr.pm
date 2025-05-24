@@ -6,48 +6,51 @@ use parent -norequire => qw(DBI::dr);
 use DBI ();
 
 use DBIx::Squirrel::v2::ut qw(
+    croak
     is_blessed_ref
-    is_hashref
+    is_plain_hashref
 );
 
 use namespace::clean;
 
 
-sub RootClass ($class) {
+sub RootClass ( $class, @args ) {
     ( $class = ref($class) // $class // __PACKAGE__ ) =~ s/::[^:]+$//;
-    return ( RootClass => $class ) if wantarray;
-    return $class;
+    return $class unless wantarray;
+    return 'RootClass' => $class, @args;
 }
 
 
 sub connect ( $class, @args ) {
     $class = ref($class) // $class;
-    my $clonable = shift(@args)
-        if @args && is_blessed_ref( $args[0] );
-    my %attrs = do {
-        if ( @args && is_hashref( $args[$#args] ) ) {
-            ( $class->RootClass, pop(@args)->%* );
+    my %attr = do {
+        if ( @args > 1 && is_plain_hashref( $args[$#args] ) ) {
+            $class->RootClass( pop(@args)->%* );
         }
         else {
-            ( $class->RootClass );
+            $class->RootClass();
         }
     };
-    return $clonable->clone( \%attrs ) if $clonable;
-    return DBI::connect( $class, @args, \%attrs );
+    if ( @args && is_blessed_ref( $args[0] ) ) {
+        $args[0]->isa('DBI::db')
+            or croak q(Not a 'DBD::db' object);
+        return shift(@args)->clone( \%attr );
+    }
+    return DBI::connect( $class, @args, \%attr );
 }
 
 
 sub connect_cached ( $class, @args ) {
     $class = ref($class) // $class;
-    my %attrs = do {
-        if ( @args && is_hashref( $args[$#args] ) ) {
-            ( $class->RootClass, pop(@args)->%* );
+    my %attr = do {
+        if ( @args > 1 && is_plain_hashref( $args[$#args] ) ) {
+            $class->RootClass( pop(@args)->%* );
         }
         else {
-            ( $class->RootClass );
+            $class->RootClass();
         }
     };
-    return DBI::connect_cached( $class, @args, \%attrs );
+    return DBI::connect_cached( $class, @args, \%attr );
 }
 
 1;
