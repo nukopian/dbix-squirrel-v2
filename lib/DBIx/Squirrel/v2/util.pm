@@ -3,22 +3,11 @@ package    # hide from PAUSE
 use v5.38;
 use parent 'Exporter';
 
-use Sub::Name 'subname';
-
-use DBIx::Squirrel::v2::util::error qw(
-    :ERROR
-    confessf
-    croakf
-);
-
-our %EXPORT_TAGS;
 our @EXPORT_OK;
 
 
 BEGIN {
     @EXPORT_OK = ( qw(
-        confessf
-        croakf
         RootClass
     ) );
 }
