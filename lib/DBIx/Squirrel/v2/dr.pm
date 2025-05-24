@@ -3,14 +3,14 @@ package    # hide from PAUSE
 use v5.38;
 use parent -norequire => qw(DBI::dr);
 
-use DBI ();
-
-use DBIx::Squirrel::v2::ut qw(
-    croak
+use DBI       ();
+use Ref::Util qw(
     is_blessed_ref
     is_plain_hashref
-    RootClass
 );
+
+use DBIx::Squirrel::v2::util 'RootClass';
+use DBIx::Squirrel::v2::util::error 'E_BAD_DBI_DB_HANDLE';
 
 use namespace::clean;
 
@@ -26,7 +26,7 @@ sub connect ( $class, @args ) {
         }
     };
     if ( @args && is_blessed_ref( $args[0] ) ) {
-        croak q(Not a 'DBD::db' object)
+        E_BAD_DBI_DB_HANDLE
             unless $args[0]->isa('DBI::db');
         return shift(@args)->clone( \%attr );
     }
