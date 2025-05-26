@@ -13,6 +13,7 @@ use Sub::Name 'subname';
 use DBIx::Squirrel::v2::util::message qw(
     :ERROR
     %MESSAGE
+    message
 );
 
 our %EXPORT_TAGS;
@@ -30,7 +31,7 @@ BEGIN {
         *{ $k } = subname(
             $k,
             sub : prototype(;@) {
-                local @_ = ( $MESSAGE{$k}, @_ );
+                local @_ = message( $k, @_ );
                 goto &croakf unless $ENABLE_STACK_TRACE;
                 goto &confessf;
             },

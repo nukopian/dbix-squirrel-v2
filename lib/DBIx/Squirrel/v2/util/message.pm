@@ -15,7 +15,7 @@ BEGIN {
     $EXPORT_TAGS{ERROR} = [];
 
     for my( $k, $m ) (
-        E_BAD_DBI_DB_HANDLE => qq(bad 'DBD::db' handle),
+        E_BAD_DBI_DB_HANDLE => qq(bad 'DBI::db' handle),
     ) {
         $MESSAGE{$k} = $m;
         *{ $k } = \$MESSAGE{$k};
@@ -26,8 +26,16 @@ BEGIN {
         $EXPORT_TAGS{ERROR}->@*,
         qw(
             %MESSAGE
+            message
         ),
     );
+}
+
+
+sub message ( $id, $args = undef ) {
+    return               unless exists $MESSAGE{$id};
+    return $MESSAGE{$id} unless defined $args;
+    return sprintf $MESSAGE{$id}, $args->@*;
 }
 
 1;
