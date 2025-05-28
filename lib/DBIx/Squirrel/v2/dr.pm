@@ -26,9 +26,10 @@ sub connect ( $class, @args ) {
         }
     };
     if ( @args && is_blessed_ref( $args[0] ) ) {
+        my $clonable = shift(@args);
         E_BAD_DBI_DB_HANDLE
-            unless $args[0]->isa('DBI::db');
-        return shift(@args)->clone( \%attr );
+            unless $clonable->isa('DBI::db');
+        return $clonable->clone( \%attr );
     }
     return DBI::connect( $class, @args, \%attr );
 }
