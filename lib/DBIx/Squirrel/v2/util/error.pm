@@ -36,7 +36,7 @@ BEGIN {
                 goto &confessf;
             },
         );
-        push $EXPORT_TAGS{ERROR}->@*, $k;
+        push $EXPORT_TAGS{ERROR}->@*, '&' . $k;
     }
 
     @EXPORT_OK = (
