@@ -4,17 +4,13 @@ use v5.38;
 use parent 'Exporter';
 
 use Carp qw(
-    confess
-    croak
+    &confess
+    &croak
 );
-use Ref::Util 'is_arrayref';
-use Sub::Name 'subname';
+use Ref::Util qw(&is_arrayref);
+use Sub::Name qw(&subname);
 
-use DBIx::Squirrel::v2::util::message qw(
-    :ERROR
-    %MESSAGE
-    message
-);
+use DBIx::Squirrel::v2::util::message qw( :ERROR %MSG &MSG );
 
 our %EXPORT_TAGS;
 our @EXPORT_OK;
@@ -31,7 +27,7 @@ BEGIN {
         *{ $k } = subname(
             $k,
             sub : prototype(;@) {
-                local @_ = message( $k, @_ );
+                local @_ = MSG( $k, @_ );
                 goto &croakf unless $ENABLE_STACK_TRACE;
                 goto &confessf;
             },

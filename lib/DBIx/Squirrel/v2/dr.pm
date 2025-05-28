@@ -5,12 +5,12 @@ use parent -norequire => qw(DBI::dr);
 
 use DBI       ();
 use Ref::Util qw(
-    is_blessed_ref
-    is_plain_hashref
+    &is_blessed_ref
+    &is_plain_hashref
 );
 
-use DBIx::Squirrel::v2::util 'RootClass';
-use DBIx::Squirrel::v2::util::error 'E_BAD_DBI_DB_HANDLE';
+use DBIx::Squirrel::v2::util        qw(&RootClass);
+use DBIx::Squirrel::v2::util::error qw(&E_BAD_DB_HANDLE);
 
 use namespace::clean;
 
@@ -27,7 +27,7 @@ sub connect ( $class, @args ) {
     };
     if ( @args && is_blessed_ref( $args[0] ) ) {
         my $clonable = shift(@args);
-        E_BAD_DBI_DB_HANDLE
+        E_BAD_DB_HANDLE
             unless $clonable->isa('DBI::db');
         return $clonable->clone( \%attr );
     }
