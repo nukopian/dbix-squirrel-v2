@@ -10,7 +10,11 @@ use Carp qw(
 use Ref::Util qw(&is_arrayref);
 use Sub::Name qw(&subname);
 
-use DBIx::Squirrel::v2::util::message qw( :ERROR %MSG &MSG );
+use DBIx::Squirrel::v2::util::message qw(
+    :ERROR
+    %MSG
+    &MSG
+);
 
 our %EXPORT_TAGS;
 our @EXPORT_OK;
@@ -20,8 +24,9 @@ our $ENABLE_STACK_TRACE;
 BEGIN {
     no strict 'refs';
 
-    $EXPORT_TAGS{ERROR}
-        = [ $DBIx::Squirrel::v2::util::message::EXPORT_TAGS{ERROR}->@* ];
+    $EXPORT_TAGS{ERROR} = [
+        $DBIx::Squirrel::v2::util::message::EXPORT_TAGS{ERROR}->@*,
+    ];
 
     for my $k ( map( substr( $_, 1 ), $EXPORT_TAGS{ERROR}->@* ) ) {
         *{ $k } = subname(
