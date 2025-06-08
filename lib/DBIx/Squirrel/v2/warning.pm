@@ -15,7 +15,7 @@ our %EXPORT_TAGS;
 our $ENABLE_STACK_TRACE = !!1;
 
 
-BEGIN {
+{
     no strict 'refs';
 
     $EXPORT_TAGS{WARNING} = $EXPORT_TAGS{W} = [
@@ -32,6 +32,7 @@ BEGIN {
                 goto &carpf;
             },
         );
+        $EXPORT_TAGS{$id} = [ map( $_ . $id, '&', '$' ) ];
         push $EXPORT_TAGS{W}->@*, '&' . $id;
     }
 

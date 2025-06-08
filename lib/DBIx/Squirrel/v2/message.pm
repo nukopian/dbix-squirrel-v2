@@ -8,7 +8,7 @@ use Ref::Util qw(&is_arrayref);
 
 our @EXPORT_OK;
 our %EXPORT_TAGS;
-our @MESSAGES = (
+our @CATALOG = (
     E_BAD_DB_HANDLE => q(bad 'DBI::db' handle),
     W_DUMMY         => q(a dummy warning),
 );
@@ -18,19 +18,19 @@ our %MSG;
 {
     no strict 'refs';
 
-    my %catalog = (
+    my %tags = (
         D => 'DEBUG',
         E => 'ERROR',
         I => 'INFO',
         W => 'WARNING',
     );
 
-    for ( keys %catalog ) {
+    for ( keys %tags ) {
         $EXPORT_TAGS{$_} = [];
-        $EXPORT_TAGS{ $catalog{$_} } = $EXPORT_TAGS{$_};
+        $EXPORT_TAGS{ $tags{$_} } = $EXPORT_TAGS{$_};
     }
 
-    for my( $id, $text ) (@MESSAGES) {
+    for my( $id, $text ) (@CATALOG) {
         ( my $prefix = $id ) =~ tr/_/-/;
         $MSG{$id} = "$prefix $text";
         *{ $id } = \$MSG{$id};
@@ -39,7 +39,7 @@ our %MSG;
     }
 
     @EXPORT_OK = (
-        ( map { $EXPORT_TAGS{$_}->@* } keys %catalog ),
+        map( $EXPORT_TAGS{$_}->@*, keys %tags ),
         qw(&msg),
     );
 }
