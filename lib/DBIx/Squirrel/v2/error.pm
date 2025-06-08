@@ -1,51 +1,43 @@
 package    # hide from PAUSE
-    DBIx::Squirrel::v2::util::error;
+    DBIx::Squirrel::v2::error;
 use v5.38;
 use parent 'Exporter';
 
-use Carp qw(
-    &confess
-    &croak
-);
+use Carp      qw( &confess &croak );
 use Ref::Util qw(&is_arrayref);
 use Sub::Name qw(&subname);
 
-use DBIx::Squirrel::v2::util::message qw(
-    :ERROR
-    %MSG
-    &MSG
-);
+use DBIx::Squirrel::v2::message qw( :E &msg );
 
-our %EXPORT_TAGS;
 our @EXPORT_OK;
-our $ENABLE_STACK_TRACE;
+our %EXPORT_TAGS;
+
+our $ENABLE_STACK_TRACE = !!1;
 
 
 BEGIN {
     no strict 'refs';
 
-    $EXPORT_TAGS{ERROR} = [
-        $DBIx::Squirrel::v2::util::message::EXPORT_TAGS{ERROR}->@*,
+    $EXPORT_TAGS{ERROR} = $EXPORT_TAGS{E} = [
+        $DBIx::Squirrel::v2::message::EXPORT_TAGS{E}->@*,
     ];
 
-    for my $k ( map( substr( $_, 1 ), $EXPORT_TAGS{ERROR}->@* ) ) {
-        *{ $k } = subname(
-            $k,
+
+    for my $id ( map( substr( $_, 1 ), $EXPORT_TAGS{E}->@* ) ) {
+        *{ $id } = subname(
+            $id,
             sub : prototype(;@) {
-                local @_ = MSG( $k, @_ );
-                goto &croakf unless $ENABLE_STACK_TRACE;
-                goto &confessf;
+                local @_ = msg $id, @_;
+                goto &confessf if $ENABLE_STACK_TRACE;
+                goto &croakf;
             },
         );
-        push $EXPORT_TAGS{ERROR}->@*, '&' . $k;
+        push $EXPORT_TAGS{E}->@*, '&' . $id;
     }
 
     @EXPORT_OK = (
-        $EXPORT_TAGS{ERROR}->@*,
-        qw(
-            confessf
-            croakf
-        ),
+        $EXPORT_TAGS{E}->@*,
+        qw( &confessf &croakf ),
     );
 }
 

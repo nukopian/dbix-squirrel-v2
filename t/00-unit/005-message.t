@@ -1,7 +1,7 @@
 use v5.38;
 use Test2::V0;
-use DBIx::Squirrel::v2::util::message qw( $E_BAD_DB_HANDLE %MSG &MSG );
+use DBIx::Squirrel::v2::message qw( $E_BAD_DB_HANDLE &msg );
 
-like MSG('E_BAD_DB_HANDLE'), $E_BAD_DB_HANDLE, 'get message';
+like( msg('E_BAD_DB_HANDLE'), $E_BAD_DB_HANDLE, 'get message' );
 
 done_testing();

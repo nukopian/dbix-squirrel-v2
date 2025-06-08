@@ -4,13 +4,10 @@ use v5.38;
 use parent -norequire => qw(DBI::dr);
 
 use DBI       ();
-use Ref::Util qw(
-    &is_blessed_ref
-    &is_plain_hashref
-);
+use Ref::Util qw( &is_blessed_ref &is_plain_hashref );
 
-use DBIx::Squirrel::v2::util        qw(&RootClass);
-use DBIx::Squirrel::v2::util::error qw(&E_BAD_DB_HANDLE);
+use DBIx::Squirrel::v2::util  qw(&RootClass);
+use DBIx::Squirrel::v2::error qw(&E_BAD_DB_HANDLE);
 
 use namespace::clean;
 
