@@ -11,6 +11,28 @@ use DBIx::Squirrel::v2::error qw(&E_BAD_DB_HANDLE);
 
 use namespace::clean;
 
+=head1 CLASS METHODS
+
+=head2 RootClass
+
+The root-class of the DBI subclass.
+
+=cut
+
+
+sub RootClass ( $class, %attr ) {
+    ( $class = ref($class) // $class // __PACKAGE__ ) =~ s/::[^:]+$//;
+    return $class unless wantarray;
+    return 'RootClass' => $class, %attr;
+}
+
+
+=head2 connect
+
+Establish a connection with a datasource.
+
+=cut
+
 
 sub connect ( $class, @args ) {
     $class = ref($class) // $class;

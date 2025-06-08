@@ -5,11 +5,15 @@ use parent 'Exporter';
 
 our @EXPORT_OK;
 
+=head1 EXPORTS
 
-BEGIN {
-    @EXPORT_OK = ( qw(
-        RootClass
-    ) );
+Exports must be explicitly requested by the importing module.
+
+=cut
+
+
+{
+    @EXPORT_OK = ( qw() );
 }
 
 
