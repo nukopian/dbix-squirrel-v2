@@ -1,12 +1,19 @@
 package    # hide from PAUSE
     DBIx::Squirrel::v2::dr;
+
+=head1 NAME
+
+DBIx::Squirrel::v2::dr
+
+=cut
+
+
 use v5.38;
 use parent -norequire => qw(DBI::dr);
 
 use DBI       ();
 use Ref::Util qw( &is_blessed_ref &is_plain_hashref );
 
-use DBIx::Squirrel::v2::util  qw(&RootClass);
 use DBIx::Squirrel::v2::error qw(&E_BAD_DB_HANDLE);
 
 use namespace::clean;
@@ -53,6 +60,13 @@ sub connect ( $class, @args ) {
 }
 
 
+=head2 connect_cached
+
+Get a cached connection with a datasource, or establish a new one.
+
+=cut
+
+
 sub connect_cached ( $class, @args ) {
     $class = ref($class) // $class;
     my %attr = do {
@@ -65,5 +79,16 @@ sub connect_cached ( $class, @args ) {
     };
     return DBI::connect_cached( $class, @args, \%attr );
 }
+
+
+=head1 AUTHORS
+
+=over
+
+=item Iain Campbell <cpanic@cpan.org>
+
+=back
+
+=cut
 
 1;

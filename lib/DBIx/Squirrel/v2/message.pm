@@ -7,7 +7,6 @@ DBIx::Squirrel::v2::message
 
 =cut
 
-
 use v5.38;
 use experimental 'for_list';
 use parent 'Exporter';
@@ -21,7 +20,6 @@ our %EXPORT_TAGS;
 
 =cut
 
-
 our @CATALOG = (
     E_BAD_DB_HANDLE => q(bad 'DBI::db' handle),
     W_DUMMY         => q(a dummy warning),
@@ -31,8 +29,11 @@ our %MSG;
 
 =head1 EXPORTS
 
-=cut
+=head2 Default exports
 
+Exports must be explicitly requested by the importing module.
+
+=cut
 
 {
     no strict 'refs';
@@ -59,19 +60,33 @@ our %MSG;
 
     @EXPORT_OK = (
         map( $EXPORT_TAGS{$_}->@*, keys %tags ),
-        qw(&msg),
+        qw(&get_msg),
     );
 }
 
-=head2 msg
+
+=head2 get_msg
+
+Get a message string.
 
 =cut
 
 
-sub msg ( $id, @args ) {
+sub get_msg ( $id, @args ) {
     return                         unless defined $id;
     return join( ' ', $id, @args ) unless exists $MSG{$id};
     return @args > 0 ? sprintf( $MSG{$id}, @args ) : $MSG{$id};
 }
+
+
+=head1 AUTHORS
+
+=over
+
+=item Iain Campbell <cpanic@cpan.org>
+
+=back
+
+=cut
 
 1;

@@ -7,7 +7,6 @@ DBIx::Squirrel::v2::warning
 
 =cut
 
-
 use v5.38;
 use parent 'Exporter';
 
@@ -15,22 +14,29 @@ use Carp      qw( &carp &cluck );
 use Ref::Util qw(&is_arrayref);
 use Sub::Name qw(&subname);
 
-use DBIx::Squirrel::v2::message qw( :W &msg );
+use DBIx::Squirrel::v2::message qw( :W &get_msg );
 
 our @EXPORT_OK;
 our %EXPORT_TAGS;
 
 =head1 PACKAGE GLOBALS
 
-=cut
+=head2 $DBIx::Squirrel::v2::warning::ENABLE_STACK_TRACE
 
+True by default, this flag determines whether or not warning messages are
+to be accompanied by a stack-trace.
+
+=cut
 
 our $ENABLE_STACK_TRACE = !!1;
 
 =head1 EXPORTS
 
-=cut
+=head2 Default exports
 
+Exports must be explicitly requested by the importing module.
+
+=cut
 
 {
     no strict 'refs';
@@ -44,7 +50,7 @@ our $ENABLE_STACK_TRACE = !!1;
         *{ $id } = subname(
             $id,
             sub : prototype(;@) {
-                local @_ = msg $id, @_;
+                local @_ = get_msg $id, @_;
                 goto &cluckf if $ENABLE_STACK_TRACE;
                 goto &carpf;
             },
@@ -59,7 +65,10 @@ our $ENABLE_STACK_TRACE = !!1;
     );
 }
 
+
 =head2 carpf
+
+Emit a warning without a stack-trace.
 
 =cut
 
@@ -91,7 +100,10 @@ sub carpf : prototype(;@) {
     goto &carp;
 }
 
+
 =head2 cluckf
+
+Emit a warning with a stack-trace.
 
 =cut
 
@@ -123,5 +135,15 @@ sub cluckf : prototype(;@) {
     goto &cluck;
 }
 
+
+=head1 AUTHORS
+
+=over
+
+=item Iain Campbell <cpanic@cpan.org>
+
+=back
+
+=cut
 
 1;
