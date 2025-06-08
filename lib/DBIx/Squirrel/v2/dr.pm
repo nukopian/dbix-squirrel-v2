@@ -7,7 +7,6 @@ DBIx::Squirrel::v2::dr
 
 =cut
 
-
 use v5.38;
 use parent -norequire => qw(DBI::dr);
 
@@ -18,7 +17,16 @@ use DBIx::Squirrel::v2::error qw(&E_BAD_DB_HANDLE);
 
 use namespace::clean;
 
+=head1 EXPORTS
+
+None.
+
+=cut
+
 =head1 CLASS METHODS
+
+=cut
+
 
 =head2 RootClass
 
