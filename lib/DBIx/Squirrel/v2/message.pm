@@ -1,5 +1,13 @@
 package    # hide from PAUSE
     DBIx::Squirrel::v2::message;
+
+=head1 NAME
+
+DBIx::Squirrel::v2::message
+
+=cut
+
+
 use v5.38;
 use experimental 'for_list';
 use parent 'Exporter';
@@ -8,11 +16,22 @@ use Ref::Util qw(&is_arrayref);
 
 our @EXPORT_OK;
 our %EXPORT_TAGS;
+
+=head1 PACKAGE GLOBALS
+
+=cut
+
+
 our @CATALOG = (
     E_BAD_DB_HANDLE => q(bad 'DBI::db' handle),
     W_DUMMY         => q(a dummy warning),
 );
+
 our %MSG;
+
+=head1 EXPORTS
+
+=cut
 
 
 {
@@ -43,6 +62,10 @@ our %MSG;
         qw(&msg),
     );
 }
+
+=head2 msg
+
+=cut
 
 
 sub msg ( $id, @args ) {

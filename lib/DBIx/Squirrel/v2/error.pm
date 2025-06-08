@@ -1,5 +1,13 @@
 package    # hide from PAUSE
     DBIx::Squirrel::v2::error;
+
+=head1 NAME
+
+DBIx::Squirrel::v2::error
+
+=cut
+
+
 use v5.38;
 use parent 'Exporter';
 
@@ -12,7 +20,16 @@ use DBIx::Squirrel::v2::message qw( :E &msg );
 our @EXPORT_OK;
 our %EXPORT_TAGS;
 
+=head1 PACKAGE GLOBALS
+
+=cut
+
+
 our $ENABLE_STACK_TRACE = !!1;
+
+=head1 EXPORTS
+
+=cut
 
 
 {
@@ -42,6 +59,10 @@ our $ENABLE_STACK_TRACE = !!1;
     );
 }
 
+=head2 confessf
+
+=cut
+
 
 sub confessf : prototype(;@) {
     local @_ = do {
@@ -69,6 +90,10 @@ sub confessf : prototype(;@) {
     };
     goto &confess;
 }
+
+=head2 croakf
+
+=cut
 
 
 sub croakf : prototype(;@) {
