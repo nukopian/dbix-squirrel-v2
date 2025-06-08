@@ -32,6 +32,22 @@ None.
 
 The root-class of the DBI subclass.
 
+    $root = DBIx::Squirrel::v2::dr->RootClass;
+
+When called in Scalar-context, the root namespace of the DBI subclass is
+returned. In our example, this would be C<DBIx::Squirrel::v2>.
+
+    %hash = DBIx::Squirrel::v2::dr->RootClass(%attr);
+
+When called in List-context, a hash is returned. In our example, this would
+resemble the structure below:
+
+    ('RootClass' => 'DBIx::Squirrel::v2', %attr)
+
+The latter variation is simply a convenience for when the root-class needs
+to be included attributes passed to a database connection or statement
+handle.
+
 =cut
 
 
