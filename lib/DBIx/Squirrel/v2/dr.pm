@@ -53,8 +53,7 @@ handle.
 
 sub RootClass ( $class, %attr ) {
     ( $class = ref($class) // $class // __PACKAGE__ ) =~ s/::[^:]+$//;
-    return $class unless wantarray;
-    return 'RootClass' => $class, %attr;
+    return wantarray ? ( 'RootClass' => $class, %attr ) : $class;
 }
 
 
