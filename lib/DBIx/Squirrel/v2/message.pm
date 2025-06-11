@@ -31,7 +31,7 @@ our %MSG;
 
 =head2 Default exports
 
-Exports must be explicitly requested by the importing module.
+None.
 
 =cut
 
@@ -54,7 +54,7 @@ Exports must be explicitly requested by the importing module.
         ( my $prefix = $id ) =~ tr/_/-/;
         $MSG{$id} = "$prefix $text";
         *{ $id } = \$MSG{$id};
-        my $tag = substr $id, 0, 1;
+        my $tag = substr( $id, 0, 1 );
         push $EXPORT_TAGS{$tag}->@*, '$' . $id;
     }
 

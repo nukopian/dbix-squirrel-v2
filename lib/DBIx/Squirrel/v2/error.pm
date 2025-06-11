@@ -34,7 +34,7 @@ our $ENABLE_STACK_TRACE = !!1;
 
 =head2 Default exports
 
-Exports must be explicitly requested by the importing module.
+None.
 
 =cut
 
@@ -47,14 +47,11 @@ Exports must be explicitly requested by the importing module.
 
 
     for my $id ( map( substr( $_, 1 ), $EXPORT_TAGS{E}->@* ) ) {
-        *{ $id } = subname(
-            $id,
-            sub : prototype(;@) {
-                local @_ = get_msg $id, @_;
-                goto &confessf if $ENABLE_STACK_TRACE;
-                goto &croakf;
-            },
-        );
+        *{ $id } = subname $id => sub {
+            local @_ = get_msg( $id, @_ ) . ', stopped';
+            goto &confessf if $ENABLE_STACK_TRACE;
+            goto &croakf;
+        };
         $EXPORT_TAGS{$id} = [ map( $_ . $id, '&', '$' ) ];
         push $EXPORT_TAGS{E}->@*, '&' . $id;
     }
