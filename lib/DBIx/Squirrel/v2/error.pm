@@ -165,7 +165,7 @@ sub croakf {
 
 
 package DBIx::Squirrel::v2::Exception::Class;
-use overload '""' => sub { $_[0]{msg} };
+use overload '""' => sub { $_[0]->msg };
 
 =head1 AUTHORS
 
