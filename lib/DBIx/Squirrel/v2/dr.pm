@@ -85,7 +85,8 @@ sub connect ( $class, @args ) {
 
 =head2 connect_cached
 
-Get a cached connection with a datasource, or establish a new one.
+Get the last connection established using the same parameters (if it is
+still valid), or establish a new one.
 
 =cut
 
