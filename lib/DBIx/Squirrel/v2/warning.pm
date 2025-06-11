@@ -75,23 +75,26 @@ sub carpf : prototype(;@) {
         if (@_) {
             my $format = do {
                 if ( is_arrayref( $_[0] ) ) {
-                    join( ' ', @{ +shift } );
+                    join ' ', shift->@*;
                 }
                 else {
                     shift;
                 }
             };
-            if (@_) {
-                sprintf( $format, @_ );
+            if ( length($format) ) {
+                if (@_) {
+                    sprintf $format, @_;
+                }
+                else {
+                    $format;
+                }
             }
             else {
-                $format
-                    || $@
-                    || 'Unknown warning';
+                join ' ', @_;
             }
         }
         else {
-            $@ || 'Unknown warning';
+            'Unknown warning';
         }
     };
     goto &carp;
@@ -110,23 +113,26 @@ sub cluckf : prototype(;@) {
         if (@_) {
             my $format = do {
                 if ( is_arrayref( $_[0] ) ) {
-                    join( ' ', @{ +shift } );
+                    join ' ', shift->@*;
                 }
                 else {
                     shift;
                 }
             };
-            if (@_) {
-                sprintf( $format, @_ );
+            if ( length($format) ) {
+                if (@_) {
+                    sprintf $format, @_;
+                }
+                else {
+                    $format;
+                }
             }
             else {
-                $format
-                    || $@
-                    || 'Unknown warning';
+                join ' ', @_;
             }
         }
         else {
-            $@ || 'Unknown warning';
+            'Unknown warning';
         }
     };
     goto &cluck;

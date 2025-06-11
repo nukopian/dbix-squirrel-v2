@@ -10,8 +10,8 @@ DBIx::Squirrel::v2::error
 use v5.38;
 use parent 'Exporter';
 
-use Carp      qw( &confess &croak );
-use Ref::Util qw(&is_arrayref);
+use Carp      qw( &confess     &croak );
+use Ref::Util qw( &is_arrayref &is_blessed_ref );
 use Sub::Name qw(&subname);
 
 use DBIx::Squirrel::v2::message qw( :E &get_msg );
@@ -38,6 +38,7 @@ None.
 
 =cut
 
+
 {
     no strict 'refs';
 
@@ -45,10 +46,24 @@ None.
         $DBIx::Squirrel::v2::message::EXPORT_TAGS{E}->@*,
     ];
 
-
     for my $id ( map( substr( $_, 1 ), $EXPORT_TAGS{E}->@* ) ) {
+        eval( <<~"EOF" ) or confess $@;
+            package DBIx\::Squirrel\::v2\::Exception\::$id;
+            use v5.38;
+            no strict 'refs';
+            use Sub\::Name qw(\&subname);
+            use DBIx\::Squirrel\::v2\::message qw(\&get_msg);
+            use namespace\::clean;
+            \@DBIx\::Squirrel\::v2\::Exception\::$id\::ISA = 'DBIx\::Squirrel\::v2\::Exception::Class';
+            sub id : prototype() {'$id'}
+            sub msg {\$_[0]{msg}}
+            sub new {shift and bless { msg => get_msg('$id', \@_) }}
+            *{'DBIx\::Squirrel\::v2\::Exception\::$id'} = sub {
+                return DBIx\::Squirrel\::v2\::Exception\::$id->new(@_);
+            };
+            EOF
         *{ $id } = subname $id => sub {
-            local @_ = get_msg( $id, @_ ) . ', stopped';
+            local @_ = get_msg( $id, @_ );
             goto &confessf if $ENABLE_STACK_TRACE;
             goto &croakf;
         };
@@ -70,24 +85,32 @@ Raise an error with a stack-trace.
 =cut
 
 
-sub confessf : prototype(;@) {
+sub confessf {
     local @_ = do {
         if (@_) {
-            my $format = do {
-                if ( is_arrayref( $_[0] ) ) {
-                    join( ' ', @{ +shift } );
-                }
-                else {
-                    shift;
-                }
-            };
-            if (@_) {
-                sprintf( $format, @_ );
+            if ( is_blessed_ref( $_[0] ) ) {
+                @_;
             }
             else {
-                $format
-                    || $@
-                    || 'Unknown error';
+                my $format = do {
+                    if ( is_arrayref( $_[0] ) ) {
+                        join ' ', shift->@*;
+                    }
+                    else {
+                        shift;
+                    }
+                };
+                if ( length($format) ) {
+                    if (@_) {
+                        sprintf $format . ', stopped', @_;
+                    }
+                    else {
+                        $format . ', stopped';
+                    }
+                }
+                else {
+                    join( ' ', @_ ) . ', stopped';
+                }
             }
         }
         else {
@@ -105,24 +128,32 @@ Raise an error without a stack-trace.
 =cut
 
 
-sub croakf : prototype(;@) {
+sub croakf {
     local @_ = do {
         if (@_) {
-            my $format = do {
-                if ( is_arrayref( $_[0] ) ) {
-                    join( ' ', @{ +shift } );
-                }
-                else {
-                    shift;
-                }
-            };
-            if (@_) {
-                sprintf( $format, @_ );
+            if ( is_blessed_ref( $_[0] ) ) {
+                @_;
             }
             else {
-                $format
-                    || $@
-                    || 'Unknown error';
+                my $format = do {
+                    if ( is_arrayref( $_[0] ) ) {
+                        join ' ', shift->@*;
+                    }
+                    else {
+                        shift;
+                    }
+                };
+                if ( length($format) ) {
+                    if (@_) {
+                        sprintf $format . ', stopped', @_;
+                    }
+                    else {
+                        $format . ', stopped';
+                    }
+                }
+                else {
+                    join( ' ', @_ ) . ', stopped';
+                }
             }
         }
         else {
@@ -132,6 +163,9 @@ sub croakf : prototype(;@) {
     goto &croak;
 }
 
+
+package DBIx::Squirrel::v2::Exception::Class;
+use overload '""' => sub { $_[0]{msg} };
 
 =head1 AUTHORS
 
