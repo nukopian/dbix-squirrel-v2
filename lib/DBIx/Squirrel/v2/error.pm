@@ -58,9 +58,11 @@ None.
             sub id : prototype() {'$id'}
             sub msg {\$_[0]{msg}}
             sub new {shift and bless { msg => get_msg('$id', \@_) }}
-            *{'DBIx\::Squirrel\::v2\::Exception\::$id'} = sub {
-                return DBIx\::Squirrel\::v2\::Exception\::$id->new(@_);
-            };
+            *{'DBIx\::Squirrel\::v2\::Exception\::$id'} = subname(
+                'DBIx\::Squirrel\::v2\::Exception\::$id' => sub {
+                    return DBIx\::Squirrel\::v2\::Exception\::$id->new(@_);
+                }
+            );
             EOF
         *{ $id } = subname $id => sub {
             local @_ = get_msg( $id, @_ );
