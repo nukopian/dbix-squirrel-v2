@@ -66,13 +66,12 @@ None.
             my $format  = get_msg($id);
             my $message = get_msg($id, @_);
             my $trace   = Carp::longmess($message . ', stopped');
-            my $self    = bless {
+            bless {
                 format  => $format,
                 id      => $id,
                 message => $message,
                 trace   => $trace,
             }, $class;
-            return $self;
         };
         *{ $id } = subname $id => sub {
             local @_ = do {
