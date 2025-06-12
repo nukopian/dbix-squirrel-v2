@@ -8,27 +8,35 @@ DBIx::Squirrel::v2::error
 =cut
 
 use v5.38;
+use experimental qw(builtin);
+use builtin      qw(true);
 use parent 'Exporter';
 
-use Carp      qw( &confess     &croak );
-use Ref::Util qw( &is_arrayref &is_blessed_ref );
+use Carp      qw(&confess     &croak);
+use Ref::Util qw(&is_arrayref &is_blessed_ref);
 use Sub::Name qw(&subname);
 
-use DBIx::Squirrel::v2::message qw( :E &get_msg );
+use DBIx::Squirrel::v2::message qw(:E &get_msg);
 
 our @EXPORT_OK;
 our %EXPORT_TAGS;
 
 =head1 PACKAGE GLOBALS
 
-=head2 $DBIx::Squirrel::v2::error::ENABLE_STACK_TRACE
+=head2 $DBIx::Squirrel::v2::error::THROW_EXCEPTIONS
 
-True by default, this flag determines whether or not error messages are
-to be accompanied by a stack-trace.
+True by default, this flag determines whether errors are thrown as
+exception objects. When false, errors are reported as message strings.
+
+=head2 $DBIx::Squirrel::v2::error::THROW_WITH_TRACE
+
+True by default, this flag determines whether or not errors are accompanied
+by a stack-trace.
 
 =cut
 
-our $ENABLE_STACK_TRACE = !!1;
+our $THROW_EXCEPTIONS = true;
+our $THROW_WITH_TRACE = true;
 
 =head1 EXPORTS
 
@@ -46,36 +54,45 @@ None.
         $DBIx::Squirrel::v2::message::EXPORT_TAGS{E}->@*,
     ];
 
-    for my $id ( map( substr( $_, 1 ), $EXPORT_TAGS{E}->@* ) ) {
-        eval( <<~"EOF" ) or confess $@;
-            package DBIx\::Squirrel\::v2\::Exception\::$id;
-            use v5.38;
-            no strict 'refs';
-            use Sub\::Name qw(\&subname);
-            use DBIx\::Squirrel\::v2\::message qw(\&get_msg);
-            use namespace\::clean;
-            \@DBIx\::Squirrel\::v2\::Exception\::$id\::ISA = 'DBIx\::Squirrel\::v2\::Exception::Class';
-            sub id : prototype() {'$id'}
-            sub msg {\$_[0]{msg}}
-            sub new {shift and bless { msg => get_msg('$id', \@_) }}
-            *{'DBIx\::Squirrel\::v2\::Exception\::$id'} = subname(
-                'DBIx\::Squirrel\::v2\::Exception\::$id' => sub {
-                    return DBIx\::Squirrel\::v2\::Exception\::$id->new(@_);
-                }
-            );
-            EOF
+    for my $id (map(substr($_, 1), $EXPORT_TAGS{E}->@*)) {
+        my $except = 'DBIx::Squirrel::v2::Exception::' . $id;
+        *{ "$except\::ISA" }     = ['DBIx::Squirrel::v2::Exception::Class'];
+        *{ "$except\::id" }      = subname id      => sub { $_[0]{id} };
+        *{ "$except\::format" }  = subname format  => sub { $_[0]{format} };
+        *{ "$except\::message" } = subname message => sub { $_[0]{message} };
+        *{ "$except\::trace" }   = subname trace   => sub { $_[0]{trace} };
+        *{ "$except\::new" }     = subname new     => sub {
+            my $class   = shift;
+            my $format  = get_msg($id);
+            my $message = get_msg($id, @_);
+            my $trace   = Carp::longmess($message . ', stopped');
+            my $self    = bless {
+                format  => $format,
+                id      => $id,
+                message => $message,
+                trace   => $trace,
+            }, $class;
+            return $self;
+        };
         *{ $id } = subname $id => sub {
-            local @_ = get_msg( $id, @_ );
-            goto &confessf if $ENABLE_STACK_TRACE;
+            local @_ = do {
+                if ($THROW_EXCEPTIONS) {
+                    $except->new(@_);
+                }
+                else {
+                    get_msg($id, @_);
+                }
+            };
+            goto &confessf if $THROW_WITH_TRACE;
             goto &croakf;
         };
-        $EXPORT_TAGS{$id} = [ map( $_ . $id, '&', '$' ) ];
+        $EXPORT_TAGS{$id} = [map($_ . $id, '&', '$')];
         push $EXPORT_TAGS{E}->@*, '&' . $id;
     }
 
     @EXPORT_OK = (
         $EXPORT_TAGS{E}->@*,
-        qw( &confessf &croakf ),
+        qw(&confessf &croakf),
     );
 }
 
@@ -90,28 +107,28 @@ Raise an error with a stack-trace.
 sub confessf {
     local @_ = do {
         if (@_) {
-            if ( is_blessed_ref( $_[0] ) ) {
+            if (is_blessed_ref($_[0])) {
                 @_;
             }
             else {
                 my $format = do {
-                    if ( is_arrayref( $_[0] ) ) {
-                        join ' ', shift->@*;
+                    if (is_arrayref($_[0])) {
+                        join(' ', shift->@*);
                     }
                     else {
                         shift;
                     }
                 };
-                if ( length($format) ) {
+                if (length($format)) {
                     if (@_) {
-                        sprintf $format . ', stopped', @_;
+                        sprintf($format . ', stopped', @_);
                     }
                     else {
                         $format . ', stopped';
                     }
                 }
                 else {
-                    join( ' ', @_ ) . ', stopped';
+                    join(' ', @_) . ', stopped';
                 }
             }
         }
@@ -133,28 +150,28 @@ Raise an error without a stack-trace.
 sub croakf {
     local @_ = do {
         if (@_) {
-            if ( is_blessed_ref( $_[0] ) ) {
+            if (is_blessed_ref($_[0])) {
                 @_;
             }
             else {
                 my $format = do {
-                    if ( is_arrayref( $_[0] ) ) {
-                        join ' ', shift->@*;
+                    if (is_arrayref($_[0])) {
+                        join(' ', shift->@*);
                     }
                     else {
                         shift;
                     }
                 };
-                if ( length($format) ) {
+                if (length($format)) {
                     if (@_) {
-                        sprintf $format . ', stopped', @_;
+                        sprintf($format . ', stopped', @_);
                     }
                     else {
                         $format . ', stopped';
                     }
                 }
                 else {
-                    join( ' ', @_ ) . ', stopped';
+                    join(' ', @_) . ', stopped';
                 }
             }
         }
@@ -166,8 +183,13 @@ sub croakf {
 }
 
 
-package DBIx::Squirrel::v2::Exception::Class;
-use overload '""' => sub { $_[0]->msg };
+package    # hide from PAUSE
+    DBIx::Squirrel::v2::Exception::Class;
+use overload '""' => sub {
+    $DBIx::Squirrel::v2::error::THROW_WITH_TRACE
+        ? $_[0]->trace
+        : $_[0]->message;
+};
 
 =head1 AUTHORS
 
