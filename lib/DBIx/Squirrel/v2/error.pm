@@ -185,6 +185,7 @@ sub croakf {
 
 package    # hide from PAUSE
     DBIx::Squirrel::v2::Exception::Class;
+
 use overload '""' => sub {
     $DBIx::Squirrel::v2::error::THROW_WITH_TRACE
         ? $_[0]->trace
