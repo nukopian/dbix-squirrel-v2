@@ -55,6 +55,7 @@ None.
     ];
 
     for my $id (map(substr($_, 1), $EXPORT_TAGS{E}->@*)) {
+        ## Derive and define the exception class from the message-id.
         my $except = 'DBIx::Squirrel::v2::Exception::' . $id;
         *{ "$except\::ISA" }     = ['DBIx::Squirrel::v2::Exception'];
         *{ "$except\::id" }      = subname id      => sub { $_[0]{id} };
@@ -62,28 +63,25 @@ None.
         *{ "$except\::message" } = subname message => sub { $_[0]{message} };
         *{ "$except\::trace" }   = subname trace   => sub { $_[0]{trace} };
         *{ "$except\::new" }     = subname new     => sub {
-            my $class   = shift;
-            my $format  = get_msg($id);
-            my $message = get_msg($id, @_);
-            my $trace   = Carp::longmess($message . ', stopped');
-            bless {
-                format  => $format,
-                id      => $id,
-                message => $message,
-                trace   => $trace,
-            }, $class;
+            my $self = bless({id => "$id"}, shift);
+            $self->{format}  = get_msg("$id");
+            $self->{message} = get_msg("$id", @_);
+            $self->{trace}   = Carp::longmess($self->{message} . ', stopped');
+            return $self;
         };
+        ## Create a helper function we can call to create an exception object.
         *{ "$except" } = subname $id => sub {
             local @_ = ($except, @_);
             goto &{ "$except\::new" };
         };
+        ## Create a exported helper to report the error in the correct manner.
         *{ $id } = subname $id => sub {
             local @_ = do {
                 if ($THROW_EXCEPTIONS) {
                     $except->new(@_);
                 }
                 else {
-                    get_msg($id, @_);
+                    get_msg("$id", @_);
                 }
             };
             goto &confessf if $THROW_WITH_TRACE;
