@@ -57,10 +57,10 @@ None.
     for my $id (map(substr($_, 1), $EXPORT_TAGS{E}->@*)) {
         my $except = 'DBIx::Squirrel::v2::Exception::' . $id;
         *{ "$except\::ISA" }     = ['DBIx::Squirrel::v2::Exception'];
-        *{ "$except\::id" }      = subname id      => sub ($e) { $e->{id} };
-        *{ "$except\::format" }  = subname format  => sub ($e) { $e->{format} };
-        *{ "$except\::message" } = subname message => sub ($e) { $e->{message} };
-        *{ "$except\::trace" }   = subname trace   => sub ($e) { $e->{trace} };
+        *{ "$except\::id" }      = subname id      => sub { $_[0]{id} };
+        *{ "$except\::format" }  = subname format  => sub { $_[0]{format} };
+        *{ "$except\::message" } = subname message => sub { $_[0]{message} };
+        *{ "$except\::trace" }   = subname trace   => sub { $_[0]{trace} };
         *{ "$except\::new" }     = subname new     => sub {
             my $class   = shift;
             my $format  = get_msg($id);
