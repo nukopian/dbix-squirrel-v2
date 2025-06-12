@@ -21,8 +21,9 @@ our %EXPORT_TAGS;
 =cut
 
 our @CATALOG = (
-    E_BAD_DB_HANDLE => q(bad 'DBI::db' handle),
+    E_DUMMY         => q(a dummy error),
     W_DUMMY         => q(a dummy warning),
+    E_BAD_DB_HANDLE => q(bad 'DBI::db' handle),
 );
 
 our %MSG;
@@ -39,9 +40,7 @@ None.
     no strict 'refs';
 
     my %tags = (
-        D => 'DEBUG',
         E => 'ERROR',
-        I => 'INFO',
         W => 'WARNING',
     );
 
